@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+ name: newpd
+ labels:
+   app: flask-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: newpd
+  template:
+    metadata:
+      labels:
+        tier: newpd
+    spec:
+     containers:
+      - name: flask-conatiner
+        image: litu2rout/flask-ci-test:v1
+        ports:
+        - containerPort: 5000

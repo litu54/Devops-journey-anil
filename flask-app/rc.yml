@@ -1,0 +1,20 @@
+
+apiVersion: v1
+kind: Replicaset 
+metadata: 
+  labels: 
+    app: newapp
+    type: repl
+spec: 
+  conatiners:
+  - name: pyhtonapp
+    image: litu2rout/flask-ci-test:v1 
+
+
+replica:
+  spec:
+    labels:
+      selector:
+
+
+

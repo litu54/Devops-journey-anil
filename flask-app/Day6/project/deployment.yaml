@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: calculator-deploy
+  name: calculator-deploy
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: calculator-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: calculator-deploy
+    spec:
+      containers:
+      - image: litu2rout/calculator-app:v1
+        name: calculator-app
+        ports:
+        - containerPort: 9000
+        resources: {}
+status: {}

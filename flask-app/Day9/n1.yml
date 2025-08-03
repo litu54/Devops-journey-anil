@@ -1,0 +1,12 @@
+# nginx-pod-selector.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-selector
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  nodeSelector:
+    disktype: ssd
+

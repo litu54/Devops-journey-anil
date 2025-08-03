@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: calc-deploy2
+  name: calc-deploy2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: calc-deploy2
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: calc-deploy2
+    spec:
+      containers:
+      - image: litu2rout/flask-ci-test:v1
+        name: flask-ci-test
+        ports:
+          - containerPort: 5000
+        resources: {}
+status: {}

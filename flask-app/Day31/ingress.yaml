@@ -1,0 +1,69 @@
+apiVersion: networking.k8s.io/v1           # API version for Ingress resource; stable since Kubernetes v1.19
+kind: Ingress                              # Declares that this manifest defines an Ingress resource
+metadata:
+  name: ingress-demo1                      # Name of the Ingress resource
+  namespace: app1-ns                       # Namespace in which this Ingress is deployed
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    # Makes the ALB internet-facing (publicly accessible); other option is 'internal' for private use
+
+    alb.ingress.kubernetes.io/load-balancer-name: cwvj-ingress-demo1
+    # Assigns a custom name to the ALB; helpful for identification in the AWS Console
+
+    alb.ingress.kubernetes.io/target-type: ip
+    # Registers individual Pod IPs (via VPC CNI) in ALB target groups, skipping NodePort/host networking
+
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    # Configures the ALB to listen on HTTP port 80; JSON array allows multiple listeners if needed (e.g., HTTPS)
+
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    # Defines protocol used for ALB health checks (can be HTTP or HTTPS)
+
+    alb.ingress.kubernetes.io/healthcheck-port: traffic-port
+    # Uses the same port as the listener for health checks ('traffic-port' is a special keyword)
+
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '15'
+    # Frequency (in seconds) with which ALB sends health check requests
+
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '5'
+    # Max time (in seconds) to wait for a health check response
+
+    alb.ingress.kubernetes.io/healthy-threshold-count: '2'
+    # Number of successful health checks before a target is marked healthy
+
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'
+    # Number of failed health checks before a target is marked unhealthy
+
+    alb.ingress.kubernetes.io/success-codes: '200'
+    # ALB considers HTTP 200 as a successful health check response
+
+spec:
+  ingressClassName: alb                    # Instructs Kubernetes to use the AWS ALB Ingress Controller for this resource
+
+  rules:                                   # List of rules that define how traffic is routed
+    - http:                                # All rules here apply to HTTP traffic
+        paths:                             # Each entry defines a routing path
+          - path: /iphone
+            pathType: Prefix               # Match all paths that start with '/iphone'
+            backend:
+              service:
+                name: iphone-svc           # Traffic matching '/iphone' goes to this Kubernetes Service
+                port:
+                  number: 80               # Service port (which maps to containerPort 5678 inside pods)
+
+          - path: /android
+            pathType: Prefix               # Match all paths starting with '/android'
+            backend:
+              service:
+                name: android-svc          # Routes traffic to android-svc
+                port:
+                  number: 80               # Matches the port exposed by the android-svc
+
+          - path: /
+            pathType: Prefix               # Catch-all path for requests that don't match the above
+            backend:
+              service:
+                name: desktop-svc          # Default backend service for unmatched paths (e.g., desktop)
+                port:
+                  number: 80               # Service port for desktop-svc
+
